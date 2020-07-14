@@ -1,1 +1,1 @@
-# MAML-for-anoamly-detection
+# This is the official implementation of Few-shot Scene-adaptive Anomaly Detection
