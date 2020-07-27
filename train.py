@@ -21,7 +21,7 @@ from torch.nn import functional as F
 from unet_parts import *
 from scipy.misc import imsave
 from torch.nn import BCELoss as adversarial_loss
-
+import ast
 
 from rGAN import Generator, Discriminator
 from dataset import TrainingDataset
@@ -102,13 +102,16 @@ def main(k_shots, num_tasks, adam_betas, gen_lr, dis_lr, total_epochs, model_fol
     previous_generator = generator_path
     previous_discriminator = discriminator_path
 
+    frame_path = '/mnt/creeper/grad/luy2/Meta-Learning/data/shanghaitech-5tasks/training/frames/' 
+
     # Set Up Training Loop
     for epoch in range(total_epochs):
-        train_path_list = createEpochData(num_tasks)
+        train_path_list = createEpochData(frame_path, num_tasks, k_shots)
         train_dataloader = Load_Dataloader(train_path_list, tf, batch_size)
         for _, epoch_of_tasks in enumerate(train_dataloader):
-            """ CMD LINE ARG """
-            epoch_results = './meta_Shanghai_5_task_Results_k1/{}'.format(epoch+1)
+            
+            # Create folder for saving results
+            epoch_results = 'results'.format(epoch+1)
             create_folder(epoch_results)
 
             gen_epoch_grads = []
@@ -250,11 +253,23 @@ def main(k_shots, num_tasks, adam_betas, gen_lr, dis_lr, total_epochs, model_fol
 
 
 if __name__ == "__main__":
-    k_shots = 1 
-    num_tasks = 6
-    adam_betas = (0.5, 0.999)
-    gen_lr = 2e-4
-    dis_lr = 1e-5
-    total_epochs = 2000
-    model_folder_path = "./meta_Shanghai_5_task_models_k1/"
+    if (len(sys.argv) == 8):
+        """SYS ARG ORDER: 
+        K_shots, num_tasks, adam_betas, generator lr, discriminator lr, total epochs, save model path
+        """
+        k_shots = int(sys.argv[1])
+        num_tasks =  int(sys.argv[2])
+        adam_betas = ast.literal_eval(sys.argv[3])
+        gen_lr = float(sys.argv[4])
+        dis_lr = float(sys.argv[5])
+        total_epochs = int(sys.argv[6])
+        model_folder_path = sys.argv[7]
+    else:
+        k_shots = 1 
+        num_tasks = 6
+        adam_betas = (0.5, 0.999)
+        gen_lr = 2e-4
+        dis_lr = 1e-5
+        total_epochs = 2000
+        model_folder_path = "model"
     main(k_shots, num_tasks, adam_betas, gen_lr, dis_lr, total_epochs, model_folder_path)
