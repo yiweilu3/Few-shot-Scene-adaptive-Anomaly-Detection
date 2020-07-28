@@ -41,7 +41,7 @@ def createEpochData(frame_path, numTasks, k_shots):
     # for task in range(len(task_order)):
     for task in range(numTasks):
         video = selected_videos[task]
-        video_folder, k_shot_frames = generate_k_shot_frames(video)        
+        video_folder, k_shot_frames = generate_k_shot_frames(video, k_shots)        
         train_curr_paths.append([[os.path.join(frame_path, str(video_folder), ind) for ind in frame] for frame in k_shot_frames])
     train_path_list.append(train_curr_paths)
 
